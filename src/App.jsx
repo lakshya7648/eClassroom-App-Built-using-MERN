@@ -51,10 +51,10 @@ function App() {
               element={<ProtectedRoute Component={TeacherDashboard} />} />
             <Route
               path="/teacher/dashboard/classrooms"
-              element={<ProtectedRoute Component={Classrooms} />} />
+              element={<ProtectedRoute Component={Classrooms} setAlert={setAlert} />} />
             <Route
               path="/teacher/dashboard/classrooms/:classroomId"
-              element={<ProtectedRoute Component={StudyMaterial} />} />
+              element={<ProtectedRoute Component={StudyMaterial}/>} />
             <Route 
               path = "/teacher/dashboard/students"
               element={<ProtectedRoute Component={EnrolledStudents}/>}

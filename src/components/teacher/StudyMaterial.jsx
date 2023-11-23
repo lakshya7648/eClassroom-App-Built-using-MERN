@@ -15,7 +15,6 @@ const StudyMaterial = () => {
   const [loading, setLoading] = useState(false);
   const [reload, setReload] = useState(false); //incase a new material is added we need refetching of study material from the database
 
-
   const fetchStudyMaterial = async () => {
     const url = modifyTeacherUrl(`study_material/${classroomId}`);
     const headers = {
@@ -23,9 +22,11 @@ const StudyMaterial = () => {
       "auth-token": localStorage.getItem("authToken"),
     };
     const studyMaterial = await fetchRequestedData(url, "GET", headers);
-    console.log(studyMaterial);
-    setLectures(studyMaterial.studyMaterial[0].video_links);
-    setNotes(studyMaterial.studyMaterial[0].notes_links);
+    // console.log(studyMaterial);
+    if (studyMaterial && studyMaterial.success && studyMaterial.studyMaterial.length != 0) {
+      setLectures(studyMaterial.studyMaterial[0].video_links);
+      setNotes(studyMaterial.studyMaterial[0].notes_links);
+    }
   };
 
   const openMaterialAddModal = () => {
@@ -51,7 +52,7 @@ const StudyMaterial = () => {
       body: formData,
     });
     const result = await response.json();
-    if(result.success) {
+    if (result.success) {
       setReload(true);
     } else {
       console.log("Some error occurred!!");
@@ -79,7 +80,7 @@ const StudyMaterial = () => {
       </button>
 
       {/* Tabs for showing notes - videos and notes */}
-      <div className="md:px-32 py-2">
+      <div className="md:px-32 py-2 mt-10 md:mt-0">
         <h1 className="py-2 mb-4 text-center text-4xl font-Young-Serif font-bold">
           Study Materials
         </h1>
@@ -136,8 +137,8 @@ const StudyMaterial = () => {
               {lectures.length != 0 &&
                 lectures.map((lecture) => {
                   return (
-                    <StudyMaterialCard 
-                      key={ Math.random() * 10000 }
+                    <StudyMaterialCard
+                      key={Math.random() * 10000}
                       itemSource={`/material_uploads/${lecture.link}`}
                       itemName={lecture.title}
                     />
@@ -163,7 +164,7 @@ const StudyMaterial = () => {
                 notes.map((note) => {
                   return (
                     <NotesShowCard
-                      key={ Math.random() * 10000 }
+                      key={Math.random() * 10000}
                       itemSource={`/material_uploads/${note.link}`}
                       itemName={note.title}
                       thumbnail={"/images/pdfthumbnail.webp"}
@@ -174,7 +175,6 @@ const StudyMaterial = () => {
           </div>
         </div>
       </div>
-
 
       {/* Modal for adding a new Study Material */}
       {/* <!-- Modal toggle --> */}
@@ -229,7 +229,7 @@ const StudyMaterial = () => {
 
             <form onSubmit={addStudyMaterial}>
               <div className="p-6 space-y-6">
-              <div className="mb-6">
+                <div className="mb-6">
                   <label
                     htmlFor="lecture-upload"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"

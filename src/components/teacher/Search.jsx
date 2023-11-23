@@ -33,7 +33,6 @@ const Search = ({ enrolledStudents, setEnrolledStudents }) => {
             setEnrolledStudents(enrolledStudents);
         } else {
             const requiredStudent = enrolledStudents.filter((student) => { return student.name.toLowerCase() === searchInputValue });
-            console.log(requiredStudent)
 
             setEnrolledStudents(requiredStudent);
         }

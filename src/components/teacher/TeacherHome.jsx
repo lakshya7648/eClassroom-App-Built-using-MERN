@@ -26,7 +26,6 @@ const TeacherHome = () => {
       }
     });
     const result = await response.json();
-    console.log(result);
     setTeacherDet(result);
 
     // setting global state to be accessed by other components such as Navbar for showing credentials
@@ -66,8 +65,8 @@ const TeacherHome = () => {
         {loading && <CircleSpinner />}
         {!loading && <Outlet
           context={{
-            totalClassrooms: teacherDet.user.classrooms,
-            studentsEnrolled: students.students,
+            totalClassrooms: teacherDet.user.classrooms ? teacherDet.user.classrooms : [],
+            studentsEnrolled: students.students? students.students : [],
           }} />}
       </div>
     </div>

@@ -1,10 +1,8 @@
-export const validateEmail = (event)=>{
-    const email = event.target.value;
+export const validateEmail = (email)=>{
     return email.length > 5 && email.includes("@") && email.includes(".");
 }
 
-export const validatePassword = (event)=>{
-    const password = event.target.value;
+export const validatePassword = (password)=>{
     let containsDigit = false, containsSpecialChar = false, containsUpperCase = false;
     if(password.length < 8) {
         return false;

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
 import EmptyItemsComp from "../EmptyItemsComp";
 import { useRef } from "react";
 import { initModals } from "flowbite";
@@ -7,7 +6,7 @@ import { fetchRequestedData } from "../../helpers/FetchData";
 import { modifyTeacherUrl } from "../../helpers/HandleURL";
 import Cards from "../Cards";
 
-const Classrooms = () => {
+const Classrooms = ({ setAlert }) => {
   const [classroomDetails, setClassroomDetails] = useState({
     classroomName: "",
     classroomLevel: "",
@@ -42,7 +41,6 @@ const Classrooms = () => {
     const result = await fetchRequestedData(url, "POST", headers, body);
 
     setClassrooms([...classrooms, result]);
-    console.log(result);
   };
 
   const fetchAllClassrooms = async () => {
@@ -54,8 +52,9 @@ const Classrooms = () => {
 
     const result = await fetchRequestedData(url, "GET", headers);
 
-    setClassrooms(result.classroom);
-    console.log(classrooms);
+    if(result.classroom.length != 0) {
+      setClassrooms(result.classroom);
+    } 
   };
 
   useEffect(() => {
@@ -95,6 +94,8 @@ const Classrooms = () => {
                     classroomId={classroom._id}
                     classroomName={classroom.class_name}
                     classroomLevel={classroom.class_type}
+                    showCode={true}
+                    setAlert={setAlert}
                   />
                 </li>
               );
