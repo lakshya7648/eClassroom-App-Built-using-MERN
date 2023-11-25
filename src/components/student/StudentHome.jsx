@@ -1,77 +1,75 @@
-import React from 'react'
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CircleSpinner from '../CircleSpinner';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../state/UserSlicer/UserSlicer';
-import { Link, Outlet } from 'react-router-dom';
-import TSidebar from './TSidebar';
+import { Outlet } from 'react-router-dom';
 import { fetchRequestedData } from '../../helpers/FetchData';
+import { modifyStudentUrl } from '../../helpers/HandleURL';
+import StudentSidebar from './StudentSidebar';
 
-const TeacherHome = () => {
-
+const StudentHome = () => {
   const [loading, setLoading] = useState(true);
-  const [teacherDet, setTeacherDet] = useState({});
-  const [students, setStudents] = useState([]);
+  const [studentDet, setStudentDet] = useState({});
+  const [teachers, setTeachers] = useState([]);
   const dispatch = useDispatch();
 
-  const url = "http://localhost:5000/api/teacher/";
 
 
-  const fetchTeacherDetails = async () => {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
+  const fetchStudentDetails = async () => {
+    const url = modifyStudentUrl("");
+    const result = await fetchRequestedData(url,
+     "GET",
+      {
         'Content-Type': 'application/json',
         'auth-token': localStorage.getItem("authToken"),
       }
-    });
-    const result = await response.json();
-    setTeacherDet(result);
-    console.log(result, teacherDet);
+    );
+
+    setStudentDet(result);
 
     // setting global state to be accessed by other components such as Navbar for showing credentials
     dispatch(setUser({
       authToken: JSON.stringify(localStorage.getItem("authToken")),
-      name: result.user.name,
-      email: result.user.email,
+      name: result.student.name,
+      email: result.student.email,
     }))
 
-    document.title = `${result.user.name} - Dashboard`;
+    document.title = `${result.student.name} - Dashboard`;
 
   }
 
-  const fetchStudents = async () => {
-
-    const studentsEnrolled = await fetchRequestedData(url + "students", "GET", {
+  const fetchTeachers = async () => {
+    const url = modifyStudentUrl("teachers");
+    const teachersEnrolled = await fetchRequestedData(url, "GET", {
       "Content-Type": "application/json",
       "auth-token": localStorage.getItem("authToken"),
     });
 
-    setStudents(studentsEnrolled);
+    setTeachers(teachersEnrolled);
     setLoading(false);
   }
 
   useEffect(() => {
-    fetchTeacherDetails();
-    fetchStudents();
+    fetchStudentDetails();
+    fetchTeachers();
 
   }, [])
 
   return (
     <div className="flex">
       <div className="sidebar-component absolute md:relative md:w-64">
-        <TSidebar />
+        <StudentSidebar />
       </div>
       <div className="md:block w-full md:relative right-0 px-1 py-2">
         {loading && <CircleSpinner />}
         {!loading && <Outlet
           context={{
-            totalClassrooms: teacherDet.user.classrooms ? teacherDet.user.classrooms : [],
-            studentsEnrolled: students.students? students.students : [],
+            totalClassrooms: studentDet.student.classrooms ? studentDet.student.classrooms : [],
+            teachersEnrolled: teachers.teacher? teachers.teacher : [],
           }} />}
       </div>
     </div>
   )
 }
 
-export default TeacherHome
+export default StudentHome

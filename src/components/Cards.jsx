@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 const Cards = ({
   classroomId,
+  urlTo,
   classroomName,
   classroomLevel,
   showCode,
@@ -19,7 +20,7 @@ const Cards = ({
 
   return (
     <div className="flex flex-col md:w-[600px] m-2 px-5 py-2 bg-white border border-green-200 rounded-lg shadow mx-auto hover:bg-green-100 hover:text-green-300 dark:border-green-700 dark:bg-green-800 dark:hover:bg-green-700">
-      <Link to={`/teacher/dashboard/classrooms/${classroomId}`}>
+      <Link to={urlTo}>
         <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 hover:text-green-600 dark:text-white">
           {classroomName}
         </h5>

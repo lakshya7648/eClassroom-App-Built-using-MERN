@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, {useState, useEffect} from "react";
 import EmptyItemsComp from "../EmptyItemsComp";
 import { useRef } from "react";
 import { initModals } from "flowbite";
 import { fetchRequestedData } from "../../helpers/FetchData";
-import { modifyTeacherUrl } from "../../helpers/HandleURL";
+import { modifyStudentUrl } from "../../helpers/HandleURL";
 import Cards from "../Cards";
 
-const Classrooms = ({ setAlert }) => {
+const StudentClassrooms = ({ setAlert }) => {
   const [classroomDetails, setClassroomDetails] = useState({
-    classroomName: "",
-    classroomLevel: "",
+    classroomId: "",
   });
   const [classrooms, setClassrooms] = useState([]);
 
@@ -22,29 +21,34 @@ const Classrooms = ({ setAlert }) => {
     });
   };
 
-  const openClassroomAdditionModal = () => {
+  const openClassroomEnrollmentModal = () => {
     modalRef.current.click();
   };
 
-  const createClassroom = async (event) => {
+  const enrollMe = async (event) => {
     event.preventDefault();
     const headers = {
       "Content-Type": "application/json",
       "auth-token": localStorage.getItem("authToken"),
     };
-    const body = {
-      class_name: classroomDetails.classroomName,
-      class_type: classroomDetails.classroomLevel,
-    };
 
-    const url = modifyTeacherUrl("classrooms");
-    const result = await fetchRequestedData(url, "POST", headers, body);
+    const url = modifyStudentUrl(`enrollme/${classroomDetails.classroomId}`);
+    let result;
 
-    setClassrooms([...classrooms, result]);
+    try {
+      result = await fetchRequestedData(url, "PUT", headers);
+    } catch (error) {
+      setAlert("text-red-800", "bg-red-100", error.message || error);
+    }
+
+    if(result.enrollStatus) {
+      setAlert("text-yellow-800", "bg-yellow-100", "Classroom Already Enrolled");
+    }
+    // console.log(result);
   };
 
   const fetchAllClassrooms = async () => {
-    const url = modifyTeacherUrl("classrooms");
+    const url = modifyStudentUrl("classrooms/accepted");
     const headers = {
       "Content-Type": "application/json",
       "auth-token": localStorage.getItem("authToken"),
@@ -52,9 +56,9 @@ const Classrooms = ({ setAlert }) => {
 
     const result = await fetchRequestedData(url, "GET", headers);
 
-    if(result.classroom.length != 0) {
+    if (result.classroom.length != 0) {
       setClassrooms(result.classroom);
-    } 
+    }
   };
 
   useEffect(() => {
@@ -69,9 +73,9 @@ const Classrooms = ({ setAlert }) => {
       <button
         type="button"
         className="add-classroom fixed z-0 right-2 text-center px-5 py-3 bg-white border border-green-900 text-green-900 rounded-full  hover:bg-green-900 hover:text-white font-Young-Serif overflow-hidden"
-        onClick={openClassroomAdditionModal}
+        onClick={openClassroomEnrollmentModal}
       >
-        Add Classroom
+        Enroll me!
       </button>
 
       {classrooms.length == 0 && (
@@ -92,10 +96,10 @@ const Classrooms = ({ setAlert }) => {
                 <li key={classroom._id} className="">
                   <Cards
                     classroomId={classroom._id}
-                    urlTo = {`/teacher/dashboard/classrooms/${classroom._id}`}
+                    urlTo={`/student/dashboard/classrooms/${classroom._id}`}
                     classroomName={classroom.class_name}
                     classroomLevel={classroom.class_type}
-                    showCode={true}
+                    showCode={false}
                     setAlert={setAlert}
                   />
                 </li>
@@ -128,7 +132,7 @@ const Classrooms = ({ setAlert }) => {
             {/* <!-- Modal header --> */}
             <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
               <h3 className="text-xl text-center font-semibold text-gray-900 dark:text-white">
-                Create a new classroom
+                Enroll in a new classroom
               </h3>
               <button
                 type="button"
@@ -156,42 +160,23 @@ const Classrooms = ({ setAlert }) => {
 
             {/* <!-- Modal body --> */}
 
-            <form onSubmit={createClassroom}>
+            <form onSubmit={enrollMe}>
               <div className="p-6 space-y-6">
                 <div className="mb-6">
                   <label
-                    htmlFor="classroom-name"
+                    htmlFor="classroom-id"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
-                    Classrom Name
+                    Please Provide Classroom ID
                   </label>
                   <input
                     type="text"
-                    id="classroom-name"
-                    name="classroomName"
-                    value={classroomDetails.classroomName}
+                    id="classroom-id"
+                    name="classroomId"
+                    value={classroomDetails.classroomId}
                     minLength={3}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-green-500 dark:focus:border-green-500"
-                    placeholder="DBMS Class or Science Class"
-                    onChange={updateClassroomDetails}
-                    required
-                  />
-                </div>
-                <div className="mb-6">
-                  <label
-                    htmlFor="classroom-level"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Level
-                  </label>
-                  <input
-                    type="text"
-                    id="classroom-level"
-                    name="classroomLevel"
-                    value={classroomDetails.classroomLevel}
-                    minLength={2}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-green-500 dark:focus:border-green-500"
-                    placeholder="12th or 10th or Graduation - BCA, BTech, etc"
+                    placeholder="abbccd1237764"
                     onChange={updateClassroomDetails}
                     required
                   />
@@ -205,7 +190,7 @@ const Classrooms = ({ setAlert }) => {
                   type="submit"
                   className="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
                 >
-                  Create
+                  Enroll me
                 </button>
 
                 <button
@@ -224,4 +209,4 @@ const Classrooms = ({ setAlert }) => {
   );
 };
 
-export default Classrooms;
+export default StudentClassrooms;

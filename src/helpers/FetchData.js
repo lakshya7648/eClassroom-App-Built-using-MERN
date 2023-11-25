@@ -14,6 +14,7 @@ export const fetchRequestedData = async (
       });
       if(response.status == 404) throw "Resource not found";
       result = await response.json();
+      if(result.msg) throw result.msg;
     } else if (headers != null && body == null) {
       response = await fetch(url, {
         method: method,
@@ -21,10 +22,12 @@ export const fetchRequestedData = async (
       });
       if(response.status == 404) throw "Resource not found";
       result = await response.json();
+      if(result.msg) throw result.msg;
     } else if (headers == null && body == null) {
-      response = await fetch(url);
+      response = await fetch(url, {method:method});
       if(response.status == 404) throw "Resource not found";
       result = await response.json();
+      if(result.msg) throw result.msg;
     }
   } catch (error) {
     throw error;
